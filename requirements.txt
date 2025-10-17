@@ -1,0 +1,20 @@
+# --- Streamlit app 基本環境 ---
+streamlit
+streamlit-folium
+
+# --- Web / API ---
+requests
+openrouteservice
+
+# --- 影像與數據處理 ---
+opencv-python-headless
+numpy
+Pillow
+matplotlib
+torch
+torchvision
+
+# --- 地圖與座標處理 ---
+folium
+pyproj
+shapely
