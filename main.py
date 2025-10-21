@@ -9,6 +9,9 @@ from utils.UNet_mask import create_mask
 from utils.find_fire_station import get_nearest_fire_station
 import streamlit as st
 from streamlit_folium import st_folium
+import os
+from PIL import Image
+
 
 def update_config(var_name, lat, lon):
     """更新 config.py 中的座標"""
@@ -78,6 +81,36 @@ def main():
     coordinate_editor("目前位置", "origin", config.origin)
 
     
+    st.header("土石流圖片")
+
+    st.image("data\Aerophoto.jpg", use_container_width=True)
+
+    # 初始化 session_state（用來記錄上傳介面是否開啟）
+    if "show_uploader" not in st.session_state:
+        st.session_state.show_uploader = False
+
+    # 按鈕切換顯示狀態
+    if st.button("📤 開啟 / 關閉 上傳圖片"):
+        st.session_state.show_uploader = not st.session_state.show_uploader
+
+    # 如果開啟了上傳介面
+    if st.session_state.show_uploader:
+        st.info("請上傳圖片")
+
+        uploaded_file = st.file_uploader("上傳圖片", type=["jpg", "jpeg", "png"])
+
+        if uploaded_file is not None:
+            # 顯示圖片
+            image = Image.open(uploaded_file)
+            st.image(image, caption="已上傳圖片預覽", use_container_width=True)
+
+            # 儲存檔案
+            save_path = os.path.join("data", "Aerophoto.jpg")
+            with open(save_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+
+            st.success(f"✅ 圖片已儲存到：{save_path}")
+
     # 初始化地圖
     m = folium.Map(location=origin, zoom_start=15)
     fire_station_location = (0,0)
@@ -105,23 +138,40 @@ def main():
         if error == True:
             return
         # 生成遮罩
+        print("生成遮罩")
         create_mask()
 
         # 加入遮罩圖層
+        print("加入遮罩圖層")
         add_mask_to_map(m, disaster_center, height , disaster_mask_path)
 
         # 路徑規劃與繪製
+        print("路徑規劃與繪製")
         get_route_with_mode(m, choice, origin, destination, disaster_center, fire_station_location, ORS_API_KEY)
 
         # 匯出地圖
+        print("匯出地圖")
         m.save("output/output_map.html")
         print("地圖已儲存至 output/output_map.html")
 
         # ---- 顯示圖片（可使用 URL 或本地檔） ----
         st.header("空拍機圖片")
 
-        # 範例 2：本地圖片（若你有 local/path/to/image.jpg）
-        st.image("output\overlay_result.png", caption="本地圖片", use_container_width=True)
+        # # 範例 2：本地圖片（若你有 local/path/to/image.jpg）
+        # st.image("output\overlay_result.png", caption="土石流遮罩", use_container_width=True)
+        # 建立兩個欄位（左、右）
+        col1, col2 = st.columns(2)
+
+        # 左邊放「災前」圖片
+        with col1:
+            st.subheader("原始圖片")
+            st.image("data\Aerophoto.jpg", use_container_width=True)
+
+        # 右邊放「災後」圖片
+        with col2:
+            st.subheader("土石流遮罩")
+            st.image("output\overlay_result.png", use_container_width=True)
+
 
         st.markdown("---")
 
@@ -129,7 +179,7 @@ def main():
         st.header("路線地圖")
 
         # 讀取本地 HTML 檔案
-        html_path = "output\output_map.html"  # 改成你的檔名或路徑
+        html_path = "output\output_map.html"  
         with open(html_path, "r", encoding="utf-8") as f:
             html_content = f.read()
 

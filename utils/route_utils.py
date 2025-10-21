@@ -28,7 +28,7 @@ def get_route_with_mode(m, mode, origin, destination, avoid_point, fire_station_
     client = openrouteservice.Client(key=api_key)
 
     radius_m = 50  # 避開半徑
-
+    print("1")
     folium.Circle(
         location=(avoid_point),
         radius=radius_m,
@@ -37,7 +37,7 @@ def get_route_with_mode(m, mode, origin, destination, avoid_point, fire_station_
         fill=True,
         fill_opacity=0.2
     ).add_to(m)
-    
+    print("2")
     if mode == "rescue(從最近的消防隊到災區)":     # 從最近的消防隊到災區
         route = client.directions(
             coordinates=[(fire_station_location[1], fire_station_location[0]), (avoid_point[1], avoid_point[0])],
@@ -62,5 +62,5 @@ def get_route_with_mode(m, mode, origin, destination, avoid_point, fire_station_
                 "avoid_polygons": avoid_geojson
             }
         )
-
+    print("3")
     folium.GeoJson(route, name="route").add_to(m)

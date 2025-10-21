@@ -13,7 +13,7 @@ def get_nearest_fire_station():
     print(f"災區座標：{config.disaster_center}")
     params = {
         "location": f"{lat},{lon}",
-        "radius": 5000,  # 搜尋半徑，單位為米（這裡設為5000米）
+        "radius": 10000,  # 搜尋半徑，單位為公尺（這裡設為5公里）
         "type": "fire_station",  # 查找消防局
         "key": api_key
     }
