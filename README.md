@@ -1,1 +1,1 @@
-streamlit run .\main.py 輸入來啟動
+輸入 streamlit run .\main.py 來啟動
